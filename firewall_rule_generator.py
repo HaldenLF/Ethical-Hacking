@@ -30,6 +30,6 @@ action = input("Enter the action (ACCEPT or DROP): ")
 
 firewall_rule = generate_firewall_rule(source_ip, destination_ip, port, action)
 if firewall_rule:
-    print(f"Generated firewall rule: \n {firewall_rule}")
+    print(f"Generated firewall rule: \n{firewall_rule}")
 else:
     print("Invalid input. Please try again.")

@@ -11,3 +11,5 @@ Some systems will need pip3 instead of pip
 pip in install requests
 
 pip install beautifulsoup4
+
+pip install lxml

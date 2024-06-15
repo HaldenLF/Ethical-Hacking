@@ -1,68 +1,85 @@
-
 import requests
-from selenium import webdriver
 from bs4 import BeautifulSoup
 from pywinauto import Application
 import time
+import os
 
-# Adds http:// to URL from current open browser page
-def get_url_with_protocol(chrome_url):
-  if chrome_url.startswith("//"):
-    return "http://" + chrome_url
+
+previous_urls = [] # Define list to store previous URLs
+
+def is_new_url(url): # Function to check if URL is new
+  if url not in previous_urls:
+    previous_urls.append(url)
+    return True
   else:
-    return "https://" + chrome_url
+    return False
   
-# Writes data to document
-def write_to_file(data, filename):
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(data)
 
-def scrape_and_store(): 
-    app = Application(backend='uia')
+def get_url_with_protocol(url): # Adds http:// to URL
+  if url.startswith("//"):
+    return "http://" + url
+  else:
+    return "https://" + url
+  
 
-    app.connect(title_re=".*Chrome.*")
+def write_to_file(data, filename, folder_name="Scraped_Data"): # Writes data to document and stores in folder
 
-    element_name="Address and search bar"
+  if not os.path.exists(folder_name): # creates folder if not exist
+    os.makedirs(folder_name)
 
-    dlg = app.top_window()
+  filepath = os.path.join(folder_name, filename)
 
-    url = get_url_with_protocol(dlg.child_window(title=element_name, control_type="Edit").get_value())
+  with open(filepath, "w", encoding="utf-8") as f:
+    f.write(data)
 
+
+def scrape_and_store():
+  
+  app = Application(backend='uia') # Get URL from current open browser page
+
+  app.connect(title_re=".*Chrome.*") # change browser as needed
+
+  element_name="Address and search bar"
+  dlg = app.top_window()
+  print(dlg.child_window(title=element_name, control_type="Edit").get_value())
+  url = get_url_with_protocol(dlg.child_window(title=element_name, control_type="Edit").get_value())
+  
+  if is_new_url(url): # Check if URL is new
     response = requests.get(url)
-
     soup = BeautifulSoup(response.text, "lxml")
-
     data_to_store = str(soup)
 
-    # Generate timestamp for filename
-    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S") # Generate timestamp for filename
+
     filename = f"data_{timestamp}.pdf"  # Adjust file type as needed
 
     write_to_file(data_to_store, filename)
+    print(f"Scraped new URL: {url}")
+  else:
+    print(f"URL already scraped: {url}")
 
-scrape_and_store()
 
-#  Simpler version that takes user input
-# ----------------------------------------------------------------------------------
-# 
-# 
-# import requests
-# from bs4 import BeautifulSoup
+def load_previous_urls():# Load previous URLs from a file
+  filename = "previous_urls.txt"  # Adjust filetype as needed
 
-# # Writes data to document
-# def write_to_file(data, filename):
-#     with open(filename, "w") as f:
-#         f.write(data)
+  if os.path.exists(filename):
+    with open(filename, "r") as f:
+      for line in f:
+        previous_urls.append(line.strip())
 
-# # asks user for URL to scrape
-# userURL = input("What URL do you wish to scrape (https://example.com): \n"
-#                 "> ")
-# response = requests.get(userURL)
-# soup = BeautifulSoup(response.text, "lxml")
 
-# # Stores the data in file
-# # can change file type to suit, e.g. .txt .pdf .docx .xlsx... etc.
-# data_to_store = str(soup)
-# filename = "data.pdf"
+def save_previous_urls(): # Save previous URLs to a file
+  filename = "previous_urls.txt"  # Adjust filetype as needed
 
-# write_to_file(data_to_store, filename)
+  with open(filename, "w") as f:
+    for url in previous_urls:
+      f.write(url + "\n")
+
+
+if __name__ == "__main__":
+  load_previous_urls()  # Load previous URLs
+
+  while True:
+    scrape_and_store()
+    save_previous_urls() #Save updated list after each run
+    time.sleep(10) # Set desired scraping interval (seconds)

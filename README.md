@@ -1,5 +1,7 @@
 # Web-Scraper
 
+## Not currently functioning correctly
+
 A web scraper that takes a user input URL and returns all HTML data
 This scraper uses the beautiful soup package for parsing HTML
 

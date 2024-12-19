@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 from pywinauto import Application
 import time
 import os
-import threading
 
 
 previous_urls = [] # Define list to store previous URLs
@@ -95,5 +94,3 @@ if __name__ == "__main__":
     scrape_and_store()
     save_previous_urls() #Save updated list after each run
     time.sleep(3) # Set desired scraping interval (seconds)
-
-

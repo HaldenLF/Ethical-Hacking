@@ -28,7 +28,7 @@ def read_urls(filename):
   return urls
 
 def scrape_and_store():
-  urls = read_urls("to_scrape.txt")
+  urls = read_urls("Sites_to_scrape.txt") # change to filename of list of sites to be scraped
   new_urls_scraped = False
 
   for url in urls:
@@ -37,8 +37,9 @@ def scrape_and_store():
         soup = BeautifulSoup(response.text, "lxml")
         data_to_store = str(soup)
 
+        safe_url = url.replace("http://", "").replace("https://", "").replace("/", "_")
         timestamp = time.strftime("%Y-%m-%d_%H-%M-%S") # Generate timestamp for filename
-        filename = f"data_{timestamp}.txt"  # Adjust file type as needed
+        filename = f"{safe_url}_scraped_on_{timestamp}.txt"  # Adjust file type as needed
 
         write_to_file(data_to_store, filename)
         print(f"Scraped new URL: {url}")
@@ -48,7 +49,7 @@ def scrape_and_store():
   return new_urls_scraped
 
 def load_previous_urls():# Load previous URLs from a file
-  filename = "previous_urls.txt"  # Adjust filetype as needed
+  filename = "previous_scraped_urls.txt"  # Adjust filetype as needed
 
   if os.path.exists(filename):
     with open(filename, "r") as f:
@@ -57,7 +58,7 @@ def load_previous_urls():# Load previous URLs from a file
 
 
 def save_previous_urls(): # Save previous URLs to a file
-  filename = "previous_urls.txt"  # Adjust filetype as needed
+  filename = "previous_scraped_urls.txt"  # Adjust filetype as needed
 
   with open(filename, "w") as f:
     for url in previous_urls:
@@ -73,4 +74,3 @@ if __name__ == "__main__":
 
     if not new_urls_scraped:
       break
-    # time.sleep(3) # Set desired scraping interval (seconds)

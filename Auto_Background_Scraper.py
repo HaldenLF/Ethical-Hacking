@@ -54,8 +54,9 @@ def scrape_and_store():
               soup = BeautifulSoup(response.text, "lxml")
               data_to_store = str(soup)
 
+              safe_url = url.replace("http://", "").replace("https://", "").replace("/", "_")
               timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")  # Generate timestamp for filename
-              filename = f"data_{timestamp}.txt"  # Adjust file type as needed
+              filename = f"{safe_url}_scraped_on_{timestamp}.txt"  # Adjust file type as needed
 
               write_to_file(data_to_store, filename)
               print(f"Scraped new URL: {url}")
@@ -66,8 +67,6 @@ def scrape_and_store():
           
   except Exception as e:
       print(f"Error: {str(e)}")
-
-  
 
 
 def load_previous_urls():# Load previous URLs from a file

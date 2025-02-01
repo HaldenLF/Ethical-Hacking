@@ -1,0 +1,1 @@
+## A tool to check passwords against a common password list. If not in the list it tests how strong the password is.
